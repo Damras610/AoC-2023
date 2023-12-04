@@ -1,5 +1,6 @@
 # generated files folder
 out/
+.idea/sonarlint
 
 # Compiled class file
 *.class
