@@ -9,16 +9,14 @@ fun main() {
 
     val almanac = Almanac.parse(inputLines)
 
-    val minimumLocation = almanac.seedRange
-        .asSequence()
-        .flatMap { source -> getDestination(almanac.seedToSoil, source) }
-        .flatMap { source -> getDestination(almanac.soilToFertilizer, source) }
-        .flatMap { source -> getDestination(almanac.fertilizerToWater, source) }
-        .flatMap { source -> getDestination(almanac.waterToLight, source) }
-        .flatMap { source -> getDestination(almanac.lightToTemperature, source) }
-        .flatMap { source -> getDestination(almanac.temperatureToHumidity, source) }
-        .flatMap { source -> getDestination(almanac.humidityToLocation, source) }
-        .toList()
+    val minimumLocation = almanac.seedRange.toList().let { reduce(it) }
+        .flatMap { source -> getDestination(almanac.seedToSoil, source) }.let { reduce(it) }
+        .flatMap { source -> getDestination(almanac.soilToFertilizer, source) }.let { reduce(it) }
+        .flatMap { source -> getDestination(almanac.fertilizerToWater, source) }.let { reduce(it) }
+        .flatMap { source -> getDestination(almanac.waterToLight, source) }.let { reduce(it) }
+        .flatMap { source -> getDestination(almanac.lightToTemperature, source) }.let { reduce(it) }
+        .flatMap { source -> getDestination(almanac.temperatureToHumidity, source) }.let { reduce(it) }
+        .flatMap { source -> getDestination(almanac.humidityToLocation, source) }.let { reduce(it) }
         .minOf { it.first }
 
     println(minimumLocation)
@@ -27,8 +25,8 @@ fun main() {
 /**
  * Return the destination from a map and a source range
  */
-fun getDestination(currentMap: Map<LongRange, LongRange>, source: LongRange): Set<LongRange> {
-    val destination = mutableSetOf<LongRange>()
+fun getDestination(currentMap: Map<LongRange, LongRange>, source: LongRange): List<LongRange> {
+    val destination = mutableListOf<LongRange>()
     var hasIntersected = false
     currentMap.forEach {
 
@@ -60,7 +58,27 @@ fun getDestination(currentMap: Map<LongRange, LongRange>, source: LongRange): Se
     if (!hasIntersected)
         destination.add(source)
 
-    return destination.sortedBy { it.first }.toSet()
+    return destination
+}
+
+/**
+ * Merge the overlapping or directly following ranges.
+ * For example, "1..3" and "2..4" are merged into a single 1..4 range.
+ * Similarly, "1..3" and "4..6" are merged into a single 1..6 range.
+ */
+fun reduce(source: List<LongRange>): Set<LongRange> {
+    val reduced = mutableSetOf<LongRange>()
+    source.sortedBy { it.first }
+        .forEach {
+            if (reduced.isNotEmpty() && reduced.last().last + 1 >= it.first) {
+                val newRange = LongRange(reduced.last().first, it.last)
+                reduced.remove(reduced.last())
+                reduced.add(newRange)
+            } else {
+                reduced.add(it)
+            }
+        }
+    return reduced
 }
 
 fun LongRange.size(): Long {

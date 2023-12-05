@@ -55,10 +55,10 @@ data class Almanac(
         }
 
         private fun parseMap(inputLines: List<String>): Map<LongRange, LongRange> {
-            return inputLines.drop(1).map {
+            return inputLines.drop(1).associate {
                 val (destination, source, range) = it.split(" ").map { it.toLong() }
                 LongRange(source, source + range) to LongRange(destination, destination + range)
-            }.toMap().toSortedMap(compareBy { it.first })
+            }.toSortedMap(compareBy { it.first })
         }
     }
 }
