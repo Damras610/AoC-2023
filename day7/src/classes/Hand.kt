@@ -17,12 +17,22 @@ data class Hand(
         }
     }
 
-    private val distinctCards = cards.distinct().filter { it != Card.CARD_JOKER }.distinct()
+    /**
+     * The distinct cards except jokers
+     */
+    private val distinctCards = cards.distinct().filter { it != Card.CARD_JOKER }
+
+    /**
+     * The type of hand
+     */
     private val type: HandType
     init {
         type = setType()
     }
 
+    /**
+     * Set the type of hand depending on the held cards
+     */
     private fun setType() : HandType {
         return when {
             isFiveOf() -> HandType.FIVE_OF
@@ -38,7 +48,7 @@ data class Hand(
 
     private fun isFiveOf() = distinctCards.isEmpty() || distinctCards.count() == 1
     private fun isFourOf() = distinctCards.count() == 2 && (countWithJoker(distinctCards[0]) == 4 || countWithJoker(distinctCards[1]) == 4)
-    private fun isFullHouse() = distinctCards.count() == 2 && (countWithJoker(distinctCards[0]) == 3 || countWithJoker(distinctCards[0]) == 2)
+    private fun isFullHouse() = distinctCards.count() == 2 && (countWithJoker(distinctCards[0]) == 3 || countWithJoker(distinctCards[1]) == 3)
     private fun isThreeOf() = distinctCards.count() == 3 && (countWithJoker(distinctCards[0]) == 3 || countWithJoker(distinctCards[1]) == 3  || countWithJoker(distinctCards[2]) == 3)
     private fun isTwoPair() = distinctCards.count() == 3 && (countWithJoker(distinctCards[0]) == 2 || countWithJoker(distinctCards[1]) == 2)
     private fun isOnePair() = distinctCards.count() == 4
