@@ -7,7 +7,6 @@ fun main() {
     val winnings = inputLines.map {
         Hand.parse(it, jokerVariant = true)
     }.sorted().mapIndexed { index, hand ->
-        println(hand)
         hand.bid.toLong() * (index + 1)
     }.sum()
 

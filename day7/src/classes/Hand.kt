@@ -9,14 +9,16 @@ data class Hand(
     companion object {
         fun parse(inputLine: String, jokerVariant: Boolean = false): Hand {
             return Hand(
-                cards = inputLine.take(5).toCharArray().map { Card.valueOf("CARD_$it") }.map { if (jokerVariant && it == Card.CARD_J) Card.CARD_JOKER else it },
+                cards = inputLine.take(5).toCharArray()
+                    .map { Card.valueOf("CARD_$it") }
+                    .map { if (jokerVariant && it == Card.CARD_J) Card.CARD_JOKER else it },
                 bid = inputLine.substringAfter(" ").toInt()
             )
         }
     }
 
     private val distinctCards = cards.distinct().filter { it != Card.CARD_JOKER }.distinct()
-    val type: HandType
+    private val type: HandType
     init {
         type = setType()
     }
@@ -42,8 +44,24 @@ data class Hand(
     private fun isOnePair() = distinctCards.count() == 4
     private fun isHighCard() = distinctCards.count() == 5
 
-    private fun countWithJoker(card: Card): Int = cards.count { it == card && it != Card.CARD_JOKER } + cards.count { it == Card.CARD_JOKER }
+    /**
+     * Count the number of occurrence in the hand of a given card (including jokers)
+     */
+    private fun countWithJoker(card: Card): Int = cards.count { it == card || it == Card.CARD_JOKER }
 
-    override fun compareTo(other: Hand) = compareValuesBy(this, other, { it.type }, { it.cards[0] }, { it.cards[1] }, { it.cards[2] }, { it.cards[3] }, { it.cards[4] }, { it.cards[5] })
+    /**
+     * Compare the card with another.
+     */
+    override fun compareTo(other: Hand) =
+        compareValuesBy(this, other,
+            { it.type },
+            { it.cards[0] },
+            { it.cards[1] },
+            { it.cards[2] },
+            { it.cards[3] },
+            { it.cards[4] },
+            { it.cards[5] }
+    )
+
     override fun toString(): String = "${javaClass.simpleName}(cards=${cards.joinToString(prefix = "[", postfix = "]")}, bid=$bid, type=$type)"
 }

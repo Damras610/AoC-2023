@@ -1,6 +1,7 @@
 package classes
 
 enum class Card {
+    // Ranked from the weakest to the strongest
     CARD_JOKER,
     CARD_2,
     CARD_3,
